@@ -1,0 +1,1 @@
+/home/ale/work/social-bulletin/AGENTS.md

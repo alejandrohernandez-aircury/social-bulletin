@@ -1,0 +1,90 @@
+name: social-bulletin
+
+services:
+  php:
+    build: docker/php
+    environment:
+      HOST_UID: ${HOST_UID:-1000}
+      HOST_GID: ${HOST_GID:-1000}
+      XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST:-host.docker.internal}
+      XDEBUG_REMOTE_PORT: ${XDEBUG_REMOTE_PORT:-9003}
+      XDEBUG_DIR: ${XDEBUG_DIR:-/app/var/xdebug}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://bulletin:bulletin@postgres:5432/bulletin?serverVersion=17&charset=utf8}
+      # Plain URL for DSLR (it cannot parse Doctrine's query parameters).
+      DSLR_DATABASE_URL: ${DSLR_DATABASE_URL:-postgresql://bulletin:bulletin@postgres:5432/bulletin}
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  node:
+    image: node:22
+    environment:
+      HOST_UID: ${HOST_UID:-1000}
+      HOST_GID: ${HOST_GID:-1000}
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app/apps/web
+    entrypoint: /app/docker/node/entrypoint.sh
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    volumes:
+      - .:/app
+      - ./docker/certs:/certs:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nginx
+
+  nginx:
+    build: docker/nginx
+    environment:
+      HOST_UID: ${HOST_UID:-1000}
+      HOST_GID: ${HOST_GID:-1000}
+    volumes:
+      - .:/app:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/certs:/certs
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+    networks:
+      default:
+        # Lets other containers (Playwright) reach the dev hostnames.
+        aliases:
+          - dev.api.social.aleherse.com
+          - dev.app.social.aleherse.com
+
+  playwright:
+    build: docker/playwright
+    profiles: ["test"]
+    environment:
+      DSLR_DATABASE_URL: ${DSLR_DATABASE_URL:-postgresql://bulletin:bulletin@postgres:5432/bulletin}
+      NODE_EXTRA_CA_CERTS: /certs/rootCA.pem
+    volumes:
+      - .:/app
+      - ./docker/certs:/certs:ro
+    ipc: host
+    depends_on:
+      - nginx
+      - postgres
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: bulletin
+      POSTGRES_USER: bulletin
+      POSTGRES_PASSWORD: bulletin
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bulletin -d bulletin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
