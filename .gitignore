@@ -33,6 +33,7 @@ apps/api/config/jwt/
 Thumbs.db
 
 # Temporary files
+.install.lock
 *.tmp
 *.log
 apps/api/behat.yml

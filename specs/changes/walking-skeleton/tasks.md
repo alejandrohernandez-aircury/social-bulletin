@@ -59,27 +59,27 @@
 - [x] [T37] [ADR-0009] Generate a Doctrine migration (`doctrine:migrations:generate`, raw SQL over DBAL) creating schema `bulletin` and table `bulletin.users` with UUID v7 primary key, case-insensitively unique `email`, and `created_at` timestamp
 - [x] [T38] [ADR-0005] [ADR-0006] Implement in `packages/core` a user service with find-or-create-by-email and current-user lookup, using a DBAL-backed repository port, `Uuid::v7()` identifiers, `webmozart/assert` guards, and `TranslatorInterface` (contracts only) for validation messages
 - [x] [T39] [ADR-0005] [ADR-0011] Implement API endpoints in `apps/api`: `POST /api/session` (validate email, delegate to core find-or-create, set the `token` httpOnly JWT cookie), `GET /api/me` (return `{ "email": string }` or 401), and `POST /api/logout` (clear the `token` cookie); invalid email returns 4xx with a translated error and no user created
-- [ ] [T40] [ADR-0007] [ADR-0008] [ADR-0010] Implement the `apps/web` homepage in FSD layers: session API client using TanStack Query with `credentials: 'include'` calling `GET /api/me`, an email-only registration form and authenticated hello view (email + logout button) built from shadcn/ui `Card`, `Input`, `Button`, and `Label`, with visible validation/error states and copy via the `shared/i18n` public API
-- [ ] [T41] [ADR-0015] Write Behat scenarios covering: session creation sets `token` cookie and creates a user; existing email reuses the user; `GET /api/me` with and without a valid cookie; logout then 401 on `/api/me`; invalid email returns 4xx without creating a user — using JMESPath `Then` assertions and application-code `Given` steps
-- [ ] [T42] [ADR-0015] Write one Playwright journey: open the homepage and see the registration form, register a new email and see the hello view, reload and still see the hello view, log out and see the registration form again
-- [ ] [T43] [ADR-0015] Add Vitest coverage for email validation logic and conditional rendering of registration form versus hello view
+- [x] [T40] [ADR-0007] [ADR-0008] [ADR-0010] Implement the `apps/web` homepage in FSD layers: session API client using TanStack Query with `credentials: 'include'` calling `GET /api/me`, an email-only registration form and authenticated hello view (email + logout button) built from shadcn/ui `Card`, `Input`, `Button`, and `Label`, with visible validation/error states and copy via the `shared/i18n` public API
+- [x] [T41] [ADR-0015] Write Behat scenarios covering: session creation sets `token` cookie and creates a user; existing email reuses the user; `GET /api/me` with and without a valid cookie; logout then 401 on `/api/me`; invalid email returns 4xx without creating a user — using JMESPath `Then` assertions and application-code `Given` steps
+- [x] [T42] [ADR-0015] Write one Playwright journey: open the homepage and see the registration form, register a new email and see the hello view, reload and still see the hello view, log out and see the registration form again
+- [x] [T43] [ADR-0015] Add Vitest coverage for email validation logic and conditional rendering of registration form versus hello view
 
 ## Scripts
 
-- [ ] [T44] [ADR-0013] Add `.github/PULL_REQUEST_TEMPLATE.md` with the ADR-0013 template (issue link, description, CI check checkboxes for PHPSpec, Behat, Vitest, Playwright, rollout notes)
-- [ ] [T45] [ADR-0013] Add GitHub Actions workflow `.github/workflows/pull-request.yml` on `pull_request` types `[opened, edited, synchronize, reopened]`, with optional jobs for PHPSpec, Behat, Vitest, and Playwright each gated by the matching PR-body checkbox (`contains(github.event.pull_request.body, '- [x] PHPSpec')`, etc.)
-- [ ] [T46] [ADR-0014] Bootstrap an AWS CDK TypeScript app under `infrastructure/` with `live` and `preview` environment definitions and environment-scoped AWS Systems Manager Parameter Store paths (`/social-bulletin/<env>/...`) for configuration and secrets
-- [ ] [T47] [ADR-0014] Add a CDK frontend stack: private S3 bucket behind CloudFront at `app.social.aleherse.com`, with Route53 alias and ACM certificate managed by CDK
-- [ ] [T48] [ADR-0014] Add a CDK API stack: Bref PHP-FPM Lambda behind CloudFront at `api.social.aleherse.com`, a Bref console Lambda for post-deploy migrations, Route53 alias, and ACM certificate
-- [ ] [T49] [ADR-0014] Add a CDK database stack: Aurora Serverless v2 PostgreSQL cluster with one writer, no reader, and cost-optimised capacity settings, with connection secrets published to Parameter Store
-- [ ] [T50] [ADR-0014] Add GitHub Actions workflow `.github/workflows/deploy.yml` deploying via CDK on merge into the `live` branch (build frontend assets, package API for Bref, `cdk deploy`, then run migrations through the console Lambda)
+- [x] [T44] [ADR-0013] Add `.github/PULL_REQUEST_TEMPLATE.md` with the ADR-0013 template (issue link, description, CI check checkboxes for PHPSpec, Behat, Vitest, Playwright, rollout notes)
+- [x] [T45] [ADR-0013] Add GitHub Actions workflow `.github/workflows/pull-request.yml` on `pull_request` types `[opened, edited, synchronize, reopened]`, with optional jobs for PHPSpec, Behat, Vitest, and Playwright each gated by the matching PR-body checkbox (`contains(github.event.pull_request.body, '- [x] PHPSpec')`, etc.)
+- [x] [T46] [ADR-0014] Bootstrap an AWS CDK TypeScript app under `infrastructure/` with `live` and `preview` environment definitions and environment-scoped AWS Systems Manager Parameter Store paths (`/social-bulletin/<env>/...`) for configuration and secrets
+- [x] [T47] [ADR-0014] Add a CDK frontend stack: private S3 bucket behind CloudFront at `app.social.aleherse.com`, with Route53 alias and ACM certificate managed by CDK
+- [x] [T48] [ADR-0014] Add a CDK API stack: Bref PHP-FPM Lambda behind CloudFront at `api.social.aleherse.com`, a Bref console Lambda for post-deploy migrations, Route53 alias, and ACM certificate
+- [x] [T49] [ADR-0014] Add a CDK database stack: Aurora Serverless v2 PostgreSQL cluster with one writer, no reader, and cost-optimised capacity settings, with connection secrets published to Parameter Store
+- [x] [T50] [ADR-0014] Add GitHub Actions workflow `.github/workflows/deploy.yml` deploying via CDK on merge into the `live` branch (build frontend assets, package API for Bref, `cdk deploy`, then run migrations through the console Lambda)
 
 ## Documentation
 
-- [ ] [T51] Add root `README.md` covering prerequisites (Docker, Docker Compose, make), `/etc/hosts` entries for `dev.api.social.aleherse.com` and `dev.app.social.aleherse.com`, trusting the mkcert root CA from `docker/certs/rootCA.pem`, and the bootstrap/run/test/lint workflow (`make init`, `make build`, `make up`, `make db`, `make tests`, `make lint`)
-- [ ] [T52] Add root `AGENTS.md` describing the monorepo layout, `specs/decisions/` ADR conventions, Makefile-first command surface, and quality gates for agent-driven work
+- [x] [T51] Add root `README.md` covering prerequisites (Docker, Docker Compose, make), `/etc/hosts` entries for `dev.api.social.aleherse.com` and `dev.app.social.aleherse.com`, trusting the mkcert root CA from `docker/certs/rootCA.pem`, and the bootstrap/run/test/lint workflow (`make init`, `make build`, `make up`, `make db`, `make tests`, `make lint`)
+- [x] [T52] Add root `AGENTS.md` describing the monorepo layout, `specs/decisions/` ADR conventions, Makefile-first command surface, and quality gates for agent-driven work
 
 ## Cleanup
 
-- [ ] [T53] [ADR-0001] Untrack `.idea/` from git via `git rm -r --cached .idea/` so the new `.gitignore` rule takes effect
-- [ ] [T54] [ADR-0002] Remove `apps/api/compose.yaml` and `apps/api/compose.override.yaml` left by the Symfony Flex docker recipe; the root `docker-compose.yml` is the only compose entrypoint
+- [x] [T53] [ADR-0001] Untrack `.idea/` from git via `git rm -r --cached .idea/` so the new `.gitignore` rule takes effect
+- [x] [T54] [ADR-0002] Remove `apps/api/compose.yaml` and `apps/api/compose.override.yaml` left by the Symfony Flex docker recipe; the root `docker-compose.yml` is the only compose entrypoint

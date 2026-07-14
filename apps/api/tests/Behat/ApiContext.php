@@ -20,8 +20,8 @@ final class ApiContext implements Context
     #[Given('the baseline dataset is loaded')]
     public function theBaselineDatasetIsLoaded(): void
     {
-        // Baseline fixture data is created here through application code once
-        // the walking-skeleton user service exists (T38/T41). The empty
+        // The walking-skeleton slice needs no shared baseline data: session
+        // scenarios seed their own users through application code. The empty
         // baseline is still snapshotted so restores are exercised end to end.
     }
 
